@@ -58,6 +58,8 @@ func TestCdr(t *testing.T){
 func TestMisc(t *testing.T){
 	tests := map[string]string{
 		"(begin 1 (+ 3 2) 3 (list 4 4))": "(4 4)",
+		"(begin (define d 10) (define p 100) (+ p d))": "110",
+		"(begin (define a 10) (define b 100) (list (+ a b) b))": "(110 100)",
 		"(begin 1 2 3 4 5)": "5"}
 	runBasicTests(tests, t)
 }
