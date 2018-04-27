@@ -11,6 +11,7 @@ func DefaultEnv() Env {
 	env["list"] = listFunc
 	env["car"] = carFunc
 	env["cdr"] = cdrFunc
+	env["begin"] = beginFunc
 
 	return env
 }

@@ -151,3 +151,7 @@ func cdrFunc(exps[] Exp, env Env) (Exp, error) {
 
 	return Exp{list:&newList}, nil
 }
+
+func beginFunc(exps[] Exp, env Env) (Exp, error) {
+	return exps[len(exps)-1], nil
+}
