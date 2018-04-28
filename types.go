@@ -22,10 +22,16 @@ type Atom struct {
 	float 	*float64
 }
 
+type Callable interface {
+	Call([]Exp, Env)(Exp, error)
+}
+
 type Exp struct {
 	atom *Atom
 	list *List
+	callable Callable
 }
+
 
 func (e Exp) IsSymbol() bool{
 	if e.atom != nil && e.atom.symbol != nil{
@@ -86,9 +92,28 @@ func (e Exp) IsEqual(other Exp) bool {
 	return false
 }
 
+func (e Exp) DeepAtomCopy() Exp{
+	other := Exp{}
+	if e.atom != nil {
+		if e.atom.float != nil {
+			f := *e.atom.float
+			other.atom = &Atom{float:&f}
+		}else if e.atom.integer != nil {
+			i := *e.atom.integer
+			other.atom = &Atom{integer:&i}
+		}else {
+			s := *e.atom.symbol
+			other.atom = &Atom{symbol:&s}
+		}
+	}else{
+		other = e
+	}
+	return other
+}
+
 type List []Exp
 
-type Env map[string]interface{}
+type Env map[string]Exp
 
 func (e Exp) String() string {
 	var buffer bytes.Buffer
@@ -113,4 +138,31 @@ func (a Atom) String() string {
 		return fmt.Sprintf("%f", *(a.float))
 	}
 	return fmt.Sprintf("%s", string(*(a.symbol)))
+}
+
+type Procedure struct {
+	params List
+	body Exp
+	env Env
+}
+
+func (p Procedure) Call(args []Exp, env Env) (Exp, error) {
+	localEnv := make(Env)
+	for k, v := range env {
+		localEnv[k] = v.DeepAtomCopy()
+	}
+	for i, k := range p.params {
+		localEnv[string(*k.atom.symbol)] = args[i].DeepAtomCopy()
+	}
+	ret := Eval(p.body, localEnv)
+	return ret, nil
+}
+
+func (p Procedure) inParams(key string) bool {
+	for _, v := range p.params {
+		if string(*v.atom.symbol) == key {
+			return true
+		}
+	}
+	return false
 }

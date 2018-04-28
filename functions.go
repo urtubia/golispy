@@ -4,7 +4,9 @@ import (
 	"errors"
 )
 
-func greaterThanFunc(exps []Exp, env Env) (Exp, error) {
+type greaterThanCallable struct {}
+
+func (g greaterThanCallable) Call(exps []Exp, env Env) (Exp, error) {
 	exp := Exp{}
 	var ret int64
 	atom := Atom{integer: &ret}
@@ -25,7 +27,9 @@ func greaterThanFunc(exps []Exp, env Env) (Exp, error) {
 	return exp, errors.New("operands to '>' must be 2 numbers")
 }
 
-func lessThanFunc(exps []Exp, env Env) (Exp, error) {
+type lessThanCallable struct {}
+
+func (l lessThanCallable) Call(exps []Exp, env Env) (Exp, error) {
 	exp := Exp{}
 	var ret int64
 	atom := Atom{integer: &ret}
@@ -46,7 +50,9 @@ func lessThanFunc(exps []Exp, env Env) (Exp, error) {
 	return exp, errors.New("operands to '>' must be 2 numbers")
 }
 
-func addFunc(exps []Exp, env Env) (Exp, error) {
+type addCallable struct {}
+
+func (a addCallable) Call(exps []Exp, env Env) (Exp, error) {
 	opWithFloats := func(a float64,b float64) float64{
 		return a + b
 	}
@@ -56,7 +62,9 @@ func addFunc(exps []Exp, env Env) (Exp, error) {
 	return numberOperandFunc(opWithFloats, opWithInts, exps, env)
 }
 
-func multFunc(exps []Exp, env Env) (Exp, error) {
+type multCallable struct {}
+
+func (m multCallable) Call(exps []Exp, env Env) (Exp, error) {
 	opWithFloats := func(a float64,b float64) float64{
 		return a * b
 	}
@@ -66,7 +74,9 @@ func multFunc(exps []Exp, env Env) (Exp, error) {
 	return numberOperandFunc(opWithFloats, opWithInts, exps, env)
 }
 
-func subtractFunc(exps []Exp, env Env) (Exp, error) {
+type subtractCallable struct {}
+
+func (m subtractCallable) Call(exps []Exp, env Env) (Exp, error) {
 	opWithFloats := func(a float64,b float64) float64{
 		return a - b
 	}
@@ -76,7 +86,9 @@ func subtractFunc(exps []Exp, env Env) (Exp, error) {
 	return numberOperandFunc(opWithFloats, opWithInts, exps, env)
 }
 
-func divideFunc(exps []Exp, env Env) (Exp, error) {
+type divideCallable struct {}
+
+func (d divideCallable) Call(exps []Exp, env Env) (Exp, error) {
 	opWithFloats := func(a float64,b float64) float64{
 		return a / b
 	}
@@ -89,7 +101,7 @@ func divideFunc(exps []Exp, env Env) (Exp, error) {
 func numberOperandFunc(opWithFloats func(float64,float64)float64,
 	opWithInts func(int64, int64)int64, exps []Exp, env Env) (Exp, error){
 
-	exp := Eval(exps[0], env)
+	exp := Eval(exps[0].DeepAtomCopy(), env)
 	if !exp.IsNumber() {
 		return exp, errors.New("invalid operand type, must be number")
 	}
@@ -116,7 +128,9 @@ func numberOperandFunc(opWithFloats func(float64,float64)float64,
 	return exp, nil
 }
 
-func listFunc(exps[]Exp, env Env) (Exp, error) {
+type listCallable struct {}
+
+func (l listCallable) Call(exps[]Exp, env Env) (Exp, error) {
 	var list List
 	for _, v := range exps {
 		list = append(list, v)
@@ -125,7 +139,9 @@ func listFunc(exps[]Exp, env Env) (Exp, error) {
 
 }
 
-func carFunc(exps[]Exp, env Env) (Exp, error) {
+type carCallable struct {}
+
+func (l carCallable) Call(exps[]Exp, env Env) (Exp, error) {
 	if len(exps) != 1 {
 		return Exp{}, errors.New("car takes a single argument")
 	}
@@ -135,7 +151,9 @@ func carFunc(exps[]Exp, env Env) (Exp, error) {
 	return (*exps[0].list)[0], nil
 }
 
-func cdrFunc(exps[] Exp, env Env) (Exp, error) {
+type cdrCallable struct {}
+
+func (c cdrCallable) Call(exps[] Exp, env Env) (Exp, error) {
 	if len(exps) != 1 {
 		return Exp{}, errors.New("car takes a single argument")
 	}
@@ -152,6 +170,8 @@ func cdrFunc(exps[] Exp, env Env) (Exp, error) {
 	return Exp{list:&newList}, nil
 }
 
-func beginFunc(exps[] Exp, env Env) (Exp, error) {
+type beginCallable struct {}
+
+func (b beginCallable) Call(exps[] Exp, env Env) (Exp, error) {
 	return exps[len(exps)-1], nil
 }
