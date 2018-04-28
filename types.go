@@ -22,10 +22,16 @@ type Atom struct {
 	float 	*float64
 }
 
+type Callable interface {
+	Call([]Exp, Env)(Exp, error)
+}
+
 type Exp struct {
 	atom *Atom
 	list *List
+	callable Callable
 }
+
 
 func (e Exp) IsSymbol() bool{
 	if e.atom != nil && e.atom.symbol != nil{
@@ -88,7 +94,7 @@ func (e Exp) IsEqual(other Exp) bool {
 
 type List []Exp
 
-type Env map[string]interface{}
+type Env map[string]Exp
 
 func (e Exp) String() string {
 	var buffer bytes.Buffer
@@ -113,4 +119,14 @@ func (a Atom) String() string {
 		return fmt.Sprintf("%f", *(a.float))
 	}
 	return fmt.Sprintf("%s", string(*(a.symbol)))
+}
+
+type Procedure struct {
+	params List
+	body Exp
+	env Env
+}
+
+func (p Procedure) Call(args []Exp, env Env) (Exp, error) {
+	return Exp{}, nil
 }
