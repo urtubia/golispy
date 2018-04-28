@@ -92,6 +92,25 @@ func (e Exp) IsEqual(other Exp) bool {
 	return false
 }
 
+func (e Exp) DeepAtomCopy() Exp{
+	other := Exp{}
+	if e.atom != nil {
+		if e.atom.float != nil {
+			f := *e.atom.float
+			other.atom = &Atom{float:&f}
+		}else if e.atom.integer != nil {
+			i := *e.atom.integer
+			other.atom = &Atom{integer:&i}
+		}else {
+			s := *e.atom.symbol
+			other.atom = &Atom{symbol:&s}
+		}
+	}else{
+		other = e
+	}
+	return other
+}
+
 type List []Exp
 
 type Env map[string]Exp
@@ -130,14 +149,20 @@ type Procedure struct {
 func (p Procedure) Call(args []Exp, env Env) (Exp, error) {
 	localEnv := make(Env)
 	for k, v := range env {
-		localEnv[k] = v
+		localEnv[k] = v.DeepAtomCopy()
 	}
 	for i, k := range p.params {
-		localEnv[string(*k.atom.symbol)] = args[i]
+		localEnv[string(*k.atom.symbol)] = args[i].DeepAtomCopy()
 	}
-	fmt.Printf("prior to call n is %s\n", localEnv["n"])
 	ret := Eval(p.body, localEnv)
-	fmt.Println(p.body)
-	fmt.Printf("with %s return is %s\n", localEnv["n"].String(), ret.String())
 	return ret, nil
+}
+
+func (p Procedure) inParams(key string) bool {
+	for _, v := range p.params {
+		if string(*v.atom.symbol) == key {
+			return true
+		}
+	}
+	return false
 }

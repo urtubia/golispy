@@ -101,7 +101,7 @@ func (d divideCallable) Call(exps []Exp, env Env) (Exp, error) {
 func numberOperandFunc(opWithFloats func(float64,float64)float64,
 	opWithInts func(int64, int64)int64, exps []Exp, env Env) (Exp, error){
 
-	exp := Eval(exps[0], env)
+	exp := Eval(exps[0].DeepAtomCopy(), env)
 	if !exp.IsNumber() {
 		return exp, errors.New("invalid operand type, must be number")
 	}
