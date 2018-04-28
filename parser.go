@@ -15,6 +15,9 @@ func Parse(input string) (Exp, error) {
 func Tokenize(input string) []string{
 	input = strings.Replace(input,"(", " ( ", -1)
 	input = strings.Replace(input,")", " ) ", -1)
+	input = strings.Replace(input, "\n", "", -1)
+	input = strings.Replace(input, "\r", "", -1)
+	input = strings.Replace(input, "\t", "", -1)
 	tokenized := strings.Split(input, " ")
 	nonEmptyFunc := func(s string) bool {
 		if strings.Trim(s, " ") == "" {
