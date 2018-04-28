@@ -128,5 +128,16 @@ type Procedure struct {
 }
 
 func (p Procedure) Call(args []Exp, env Env) (Exp, error) {
-	return Exp{}, nil
+	localEnv := make(Env)
+	for k, v := range env {
+		localEnv[k] = v
+	}
+	for i, k := range p.params {
+		localEnv[string(*k.atom.symbol)] = args[i]
+	}
+	fmt.Printf("prior to call n is %s\n", localEnv["n"])
+	ret := Eval(p.body, localEnv)
+	fmt.Println(p.body)
+	fmt.Printf("with %s return is %s\n", localEnv["n"].String(), ret.String())
+	return ret, nil
 }
