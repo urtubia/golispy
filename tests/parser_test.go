@@ -12,7 +12,7 @@ func TestTokenizer(t *testing.T){
 	expected := strings.Split("( begin ( + 1 2 ) ( * 35 2 ) )", " ")
 	for i, v := range tokenized{
 		if v != expected[i] {
-			t.Error("%s != %s", v, expected[i])
+			t.Error(v, " != ", expected[i])
 		}
 	}
 }
@@ -54,6 +54,6 @@ func TestReadFromTokens(t *testing.T){
 	expected := "( begin  ( one  4 )  ( *  32  34  ( hello  world ) )  blah  other )"
 	result := expression.String()
 	if expected != result {
-		t.Error("Error creating AST expected %s got %s", expected, result)
+		t.Error("Error creating AST expected ", expected, " got ", result)
 	}
 }
